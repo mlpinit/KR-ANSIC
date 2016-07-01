@@ -1,4 +1,7 @@
-// Exercise 4.3, 4.4
+// Exercise:
+// 4.3 negative numbers + modulus
+// 4.4 commands for print top of stack, duplicate it, swap top 2 elements
+// 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +13,10 @@
 void push(double);
 double pop();
 int getop(char s[]);
+void print_top(void);
+void duplicate_top(void);
+void swap_top_two(void);
+void clear(void);
 
 int main(void) {
     int type;
@@ -48,6 +55,18 @@ int main(void) {
             case '\n':
                 printf("\t%.8g\n", pop());
                 break;
+            case 'P':
+                print_top();
+                break;
+            case 'D':
+                duplicate_top();
+                break;
+            case 'S':
+                swap_top_two();
+                break;
+            case 'C':
+                clear();
+                break;
             default:
                 printf("error: Unrecognized command '%s'\n", s);
                 break;
@@ -76,6 +95,26 @@ double pop() {
         printf("error: No elements in stack.\n");
         return 0.0;
     }
+}
+
+void print_top(void) {
+    printf("Top of stack: \t%.8g\n", val[sp - 1]);
+}
+
+void duplicate_top(void) {
+    push(val[sp - 1]);
+}
+
+void swap_top_two(void) {
+    double one, two;
+    one = pop();
+    two = pop();
+    push(one);
+    push(two);
+}
+
+void clear(void) {
+    sp = 0;
 }
 
 #include <ctype.h>
