@@ -6,9 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #define MAXOP 100
 #define NUMBER '0'
+#define NAME 'n'
 
 void push(double);
 double pop();
@@ -17,6 +19,7 @@ void print_top(void);
 void duplicate_top(void);
 void swap_top_two(void);
 void clear(void);
+void mathfnc(char s[]);
 
 int main(void) {
     int type;
@@ -27,6 +30,9 @@ int main(void) {
         switch (type) {
             case NUMBER:
                 push(atof(s));
+                break;
+            case NAME:
+                mathfnc(s);
                 break;
             case '+':
                 push(pop() + pop());
@@ -113,6 +119,22 @@ void swap_top_two(void) {
     push(two);
 }
 
+void mathfnc(char s[]) {
+    double op2;
+
+    if (strcmp(s, "sin") == 0)
+        push(sin(pop()));
+    else if (strcmp(s, "cos") == 0)
+        push(cos(pop()));
+    else if (strcmp(s, "exp") == 0)
+        push(exp(pop()));
+    else if (strcmp(s, "pow") == 0) {
+        op2 = pop();
+        push(pow(pop(), op2));
+    } else
+        printf("error: name '%s' not recognized\n", s);
+}
+
 void clear(void) {
     sp = 0;
 }
@@ -127,8 +149,20 @@ int getop(char s[]) {
 
     while ((s[0] = c = getch()) == ' ' || c == '\t')
         ;
-    s[1] = '\0';
     i = 0;
+    if (islower(c)) {
+        while (islower(s[++i] = c = getch()))
+            ;
+        if (c != EOF)
+            ungetch(c);
+        s[i] = '\0';
+
+        if (strlen(s) > 1)
+            return NAME;
+        else
+            return c;
+    }
+    s[1] = '\0';
     if (!isdigit(c) && c != '.' && c != '-')
         return c;
 
