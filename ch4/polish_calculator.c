@@ -1,7 +1,8 @@
 // Exercise:
 // 4.3 negative numbers + modulus
 // 4.4 commands for print top of stack, duplicate it, swap top 2 elements
-// 
+// 4.5 add support for sin, cos, exp and pow 
+// 4.6 add commands for handling variables + last variable
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +11,10 @@
 
 #define MAXOP 100
 #define NUMBER '0'
-#define NAME 'n'
+#define NAME 'N'
+#define VARIABLE 'V'
+#define VARSMAX 26
+#define LASTVAR 'L'
 
 void push(double);
 double pop();
@@ -22,10 +26,14 @@ void clear(void);
 void mathfnc(char s[]);
 
 int main(void) {
-    int type;
-    double op2;
+    int type, i;
+    double op2, last_var;
     char s[MAXOP];
+    double variables[VARSMAX];
+    int last_referenced_variable = '\0';
 
+    for (i = 0; i < VARSMAX; ++i)
+        variables[i] = '\0';
     while ((type = getop(s)) != EOF) {
         switch (type) {
             case NUMBER:
@@ -59,7 +67,21 @@ int main(void) {
                     printf("error: Division by zero.\n");
                 break;
             case '\n':
-                printf("\t%.8g\n", pop());
+                last_var = pop();
+                printf("\t%.8g\n", last_var);
+                break;
+            case '=':
+                if (variables[last_referenced_variable - 'a']) {
+                    variables[last_referenced_variable - 'a'] = pop();
+                    pop();
+                } else
+                    variables[last_referenced_variable - 'a'] = pop();
+                last_referenced_variable = '\0';
+                break;
+            case VARIABLE:
+                last_referenced_variable = s[0];
+                if (variables[last_referenced_variable])
+                    push(variables[last_referenced_variable - 'a']);
                 break;
             case 'P':
                 print_top();
@@ -72,6 +94,9 @@ int main(void) {
                 break;
             case 'C':
                 clear();
+                break;
+            case LASTVAR:
+                push(last_var);
                 break;
             default:
                 printf("error: Unrecognized command '%s'\n", s);
@@ -86,6 +111,7 @@ int main(void) {
 
 int sp = 0;
 double val[MAXVALUE];
+char current_variable = '\0';
 
 void push(double f) {
     if (sp < MAXVALUE)
@@ -159,6 +185,8 @@ int getop(char s[]) {
 
         if (strlen(s) > 1)
             return NAME;
+        else if ('a' <= s[0] && s[0] <= 'z')
+            return VARIABLE;
         else
             return c;
     }
