@@ -15,6 +15,10 @@
 #define VARIABLE 'V'
 #define VARSMAX 26
 #define LASTVAR 'L'
+#define CLEAR 'C'
+#define SWAP 'S'
+#define DUPLICATE 'D'
+#define PTOP 'P'
 
 void push(double);
 double pop();
@@ -83,16 +87,16 @@ int main(void) {
                 if (variables[last_referenced_variable])
                     push(variables[last_referenced_variable - 'a']);
                 break;
-            case 'P':
+            case PTOP:
                 print_top();
                 break;
-            case 'D':
+            case DUPLICATE:
                 duplicate_top();
                 break;
-            case 'S':
+            case SWAP:
                 swap_top_two();
                 break;
-            case 'C':
+            case CLEAR:
                 clear();
                 break;
             case LASTVAR:
