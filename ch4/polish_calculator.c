@@ -184,8 +184,7 @@ int getop(char s[]) {
     if (islower(c)) {
         while (islower(s[++i] = c = getch()))
             ;
-        if (c != EOF)
-            ungetch(c);
+        ungetch(c);
         s[i] = '\0';
 
         if (strlen(s) > 1)
@@ -203,8 +202,7 @@ int getop(char s[]) {
         if (isdigit(c = getch()) || c == '.')
             s[++i] = c;
         else {
-            if (c != EOF)
-                ungetch(c);
+            ungetch(c);
             return '-';
         }
     }
@@ -216,8 +214,7 @@ int getop(char s[]) {
             ;
     s[i] = '\0';
 
-    if (c != EOF)
-        ungetch(c);
+    ungetch(c);
     return NUMBER;
 }
 
