@@ -173,6 +173,7 @@ void clear(void) {
 
 int getch(void);
 void ungetch(int);
+void ungetcs(char []);
 
 int getop(char s[]) {
     int i, c;
@@ -234,4 +235,12 @@ void ungetch(int c) {
         printf("error: Not enough buffer space.\n");
     else
         buf[bufp++] = c;
+}
+
+void ungetcs(char s[]) {
+    int len;
+    
+    len = strlen(s);
+    while (len > 0)
+        ungetch(s[--len]);
 }
