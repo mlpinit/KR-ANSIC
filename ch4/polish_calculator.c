@@ -176,15 +176,23 @@ void ungetch(int);
 void ungetcs(char []);
 
 int getop(char s[]) {
+    static int previousc = '\0';
     int i, c;
 
-    while ((s[0] = c = getch()) == ' ' || c == '\t')
-        ;
+    if (previousc) {
+        c = previousc;
+        previousc = '\0';
+    } else
+        c = getchar();
+
+    while ((s[0] = c) == ' ' || c == '\t')
+            c = getchar();
+
     i = 0;
     if (islower(c)) {
-        while (islower(s[++i] = c = getch()))
+        while (islower(s[++i] = c = getchar()))
             ;
-        ungetch(c);
+        previousc = c;
         s[i] = '\0';
 
         if (strlen(s) > 1)
@@ -199,22 +207,22 @@ int getop(char s[]) {
         return c;
 
     if (c == '-') {
-        if (isdigit(c = getch()) || c == '.')
+        if (isdigit(c = getchar()) || c == '.')
             s[++i] = c;
         else {
-            ungetch(c);
+            previousc = c;
             return '-';
         }
     }
     if (isdigit(c))
-        while (isdigit(s[++i] = c = getch()))
+        while (isdigit(s[++i] = c = getchar()))
             ;
     if (c == '.')
-        while (isdigit(s[++i] = c = getch()))
+        while (isdigit(s[++i] = c = getchar()))
             ;
     s[i] = '\0';
 
-    ungetch(c);
+    previousc = c;
     return NUMBER;
 }
 
