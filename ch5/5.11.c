@@ -27,20 +27,16 @@ int main(int argc, char *argv[]) {
             pos += currentt - (pos % currentt);
             spaces = 0;
             putchar('\t');
-        } else if (c == '\n') {
-            while (spaces != 0) {
-                --spaces;
-                putchar(' ');
-            }
-            putchar(c);
-            pos = 0;
-            resett();
         } else {
             while (spaces != 0) {
                 --spaces;
                 putchar(' ');
             }
             putchar(c);
+            if (c == '\n') {
+                pos = 0;
+                resett();
+            }
         }
         ++pos;
     }
