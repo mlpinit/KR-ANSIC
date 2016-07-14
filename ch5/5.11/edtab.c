@@ -1,48 +1,4 @@
-// Write a program entab to turn spaces into tabs.
-
-#include <stdio.h>
-#include <stdlib.h>
-
-void settabs(int argc, char **argv);
-int gettab(int pos);
-void resett(void);
-
-int main(int argc, char *argv[]) {
-    int c, spaces, pos, currentt;
-
-    settabs(argc - 1, ++argv);
-    
-    pos = 1;
-    spaces = 0;
-    currentt = 0;
-    while ((c = getchar()) != EOF) {
-        currentt = gettab(pos);
-        if (c == ' ') {
-            ++spaces;
-            if (pos % currentt == 0) {
-                spaces = 0;
-                putchar('\t');
-            }
-        } else if (c == '\t') {
-            pos += currentt - (pos % currentt);
-            spaces = 0;
-            putchar('\t');
-        } else {
-            while (spaces != 0) {
-                --spaces;
-                putchar(' ');
-            }
-            putchar(c);
-            if (c == '\n') {
-                pos = 0;
-                resett();
-            }
-        }
-        ++pos;
-    }
-
-    return 0;
-}
+#include "edtab.h"
 
 #define MAXTABS 100
 #define TABINC 8
