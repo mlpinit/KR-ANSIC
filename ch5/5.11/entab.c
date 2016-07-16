@@ -7,10 +7,12 @@ int main(int argc, char *argv[]) {
     int c, spaces, pos, currentt;
 
     settabs(argc - 1, ++argv);
-    
+
     pos = spaces = currentt = 0;
     while ((c = getchar()) != EOF) {
+        ++pos;
         currentt = gettab(pos);
+        /* printf("currentt: %d\n", currentt); */
         if (c == ' ') {
             ++spaces;
             if (pos % currentt == 0) {
@@ -18,7 +20,7 @@ int main(int argc, char *argv[]) {
                 putchar('\t');
             }
         } else if (c == '\t') {
-            pos += currentt - (pos % currentt);
+            pos += pos % currentt;
             spaces = 0;
             putchar('\t');
         } else {
@@ -32,7 +34,6 @@ int main(int argc, char *argv[]) {
                 resett();
             }
         }
-        ++pos;
     }
 
     return 0;
