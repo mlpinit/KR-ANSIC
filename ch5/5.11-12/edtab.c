@@ -45,7 +45,7 @@ int gettab(int pos) {
 
     if (tpos < tlength && (pos <= tints[tpos] || ++tpos < tlength))
         return tints[tpos];
-    else if ((mpos && npos) && mpos <= pos) {
+    else if (mpos && npos && mpos <= pos) {
         adjustment = npos - (pos - mpos + 1) % npos;
         return (adjustment == npos) ? pos : pos + adjustment;
     }
