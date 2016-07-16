@@ -12,7 +12,6 @@ int main(int argc, char *argv[]) {
     while ((c = getchar()) != EOF) {
         ++pos;
         currentt = gettab(pos);
-        /* printf("currentt: %d\n", currentt); */
         if (c == ' ') {
             ++spaces;
             if (pos % currentt == 0) {
