@@ -11,26 +11,26 @@ int main(int argc, char *argv[]) {
 
     pos = spaces = currentt = 0;
     while ((c = getchar()) != EOF) {
+        ++pos;
         currentt = gettab(pos);
         if (c == '\t') {
-            spaces = currentt - (pos % currentt) - 1;
-            while (spaces > 0) {
-                putchar(' ');
-                --spaces;
-                ++pos;
+            spaces = 1;
+            // we don't need to increment the position when we're at the tab
+            // position
+            if (pos % currentt) {
+                spaces += currentt - (pos % currentt);
+                pos += spaces - 1;
             }
-            putchar(' ');
-            ++pos;
+            while (spaces-- > 0)
+                putchar(' ');
         }
         else if (c == '\n') {
             putchar('\n');
             pos = 0;
             resett();
         }
-        else {
+        else
             putchar(c);
-            ++pos;
-        }
     }
 
     return 0;
