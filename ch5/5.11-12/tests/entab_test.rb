@@ -9,7 +9,7 @@ class EntabTest < Minitest::Test
 
     output_text = IO.read(output_file)
     expected_output_text = IO.read("entab_test/four_tabs.expected_result")
-    assert_equal output_text, expected_output_text
+    assert_equal expected_output_text, output_text
   end
 
   def test_provided_ints_for_tab_stops
@@ -19,7 +19,17 @@ class EntabTest < Minitest::Test
 
     output_text = IO.read(output_file)
     expected_output_text = IO.read("entab_test/provided_ints.expected_result")
-    assert_equal output_text, expected_output_text
+    assert_equal expected_output_text, output_text
+  end
+
+  def test_default_tab
+    input_file = "entab_test/default_tab.txt"
+    output_file = "entab_test/default_tab.result"
+    system(".././entab < #{input_file} > #{output_file}")
+
+    output_text = IO.read(output_file)
+    expected_output_text = IO.read("entab_test/default_tab.expected_result")
+    assert_equal expected_output_text, output_text
   end
 
 end
