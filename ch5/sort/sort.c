@@ -10,12 +10,15 @@ void writelines(char *lineptr[], int, int);
 
 void myqsort(void *lineptr[], int, int, int (*comp)(void *, void *));
 int numcmp(char *, char *);
+int foldcmp(char *s1, char *s2);
 
 int main(int argc, char *argv[]) {
     int nlines;
-    int numeric = 0;
-    int reverse = 0;
+    int numeric, reverse, fold;
     char *pos;
+    int (*function)(void *, void *);
+
+    numeric = reverse = fold = 0;
     
     argv++;
     while (argc-- > 1) {
@@ -25,12 +28,20 @@ int main(int argc, char *argv[]) {
                 numeric = 1;
             if (*pos == 'r')
                 reverse = 1;
+            if (*pos == 'f')
+                fold = 1;
         }
     }
 
+    if (numeric)
+        function = numcmp;
+    else if (fold)
+        function = foldcmp;
+    else
+        function = strcmp;
+
     if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
-        myqsort((void **) lineptr, 0, nlines-1,
-                (int (*)(void *, void *))(numeric ? numcmp :strcmp));
+        myqsort((void **) lineptr, 0, nlines-1, function);
         writelines(lineptr, nlines, reverse);
         return 0;
     } else {
@@ -116,6 +127,23 @@ int numcmp(char *s1, char *s2) {
         return 1;
     else
         return 0;
+}
+
+int foldcmp(char *s1, char *s2) {
+    char tmp1, tmp2;
+
+    while (*s1 && *s2) {
+        tmp1 = (*s1 >= 'a' && *s1 <= 'z') ? *s1 - ('a' - 'A') : *s1 ;
+        tmp2 = (*s2 >= 'a' && *s2 <= 'z') ? *s2 - ('a' - 'A') : *s2 ;
+
+        if (tmp1 != tmp2)
+            return (tmp1 < tmp2) ? -1 : 1;
+        else if (tmp1 == '\0')
+            return 0;
+        ++s1, ++s2;
+    }
+
+    return 0;
 }
 
 void swap(void *v[], int i, int j) {
