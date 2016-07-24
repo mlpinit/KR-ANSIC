@@ -1,48 +1,46 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define MAXLINES 5000
+#define NUMERIC 1
+#define REVERSE 2
+#define FOLD 4
+#define DIRECTORY 8
+
 char *lineptr[MAXLINES];
+int options = 0;
 
 int readlines(char *lineptr[], int);
 void writelines(char *lineptr[], int, int);
 
 void myqsort(void *lineptr[], int, int, int (*comp)(void *, void *));
 int numcmp(char *, char *);
-int foldcmp(char *s1, char *s2);
+int charcmp(char *s1, char *s2);
 
 int main(int argc, char *argv[]) {
     int nlines;
-    int numeric, reverse, fold;
     char *pos;
-    int (*function)(void *, void *);
-
-    numeric = reverse = fold = 0;
     
     argv++;
     while (argc-- > 1) {
         pos = *argv++;
         while (*pos++) {
             if (*pos == 'n')
-                numeric = 1;
+                options |= NUMERIC;
             if (*pos == 'r')
-                reverse = 1;
+                options |= REVERSE;
             if (*pos == 'f')
-                fold = 1;
+                options |= FOLD;
+            if (*pos == 'd')
+                options |= DIRECTORY;
         }
     }
 
-    if (numeric)
-        function = numcmp;
-    else if (fold)
-        function = foldcmp;
-    else
-        function = strcmp;
-
     if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
-        myqsort((void **) lineptr, 0, nlines-1, function);
-        writelines(lineptr, nlines, reverse);
+        myqsort((void **) lineptr, 0, nlines-1, (options & NUMERIC) ? numcmp : charcmp);
+        writelines(lineptr, nlines, options & REVERSE);
         return 0;
     } else {
         printf("input too big to sort\n");
@@ -129,12 +127,22 @@ int numcmp(char *s1, char *s2) {
         return 0;
 }
 
-int foldcmp(char *s1, char *s2) {
+int charcmp(char *s1, char *s2) {
+    int directory, fold;
     char tmp1, tmp2;
 
+    fold = options & FOLD;
+    directory = options & DIRECTORY;
+
     while (*s1 && *s2) {
-        tmp1 = (*s1 >= 'a' && *s1 <= 'z') ? *s1 - ('a' - 'A') : *s1 ;
-        tmp2 = (*s2 >= 'a' && *s2 <= 'z') ? *s2 - ('a' - 'A') : *s2 ;
+        tmp1 = (islower(*s1) && fold) ? toupper(*s1) : *s1 ;
+        tmp2 = (islower(*s2) && fold) ? toupper(*s2) : *s2 ;
+
+        // change non alphanumeric, space or null characters
+        if (!(isalnum(tmp1) || tmp1 == ' ' || tmp1 == '\0') && directory)
+            tmp1 = 1;
+        if (!(isalnum(tmp2) || tmp2 == ' ' || tmp2 == '\0') && directory)
+            tmp2 = 1;
 
         if (tmp1 != tmp2)
             return (tmp1 < tmp2) ? -1 : 1;
