@@ -5,22 +5,33 @@
 #define MAXLINES 5000
 char *lineptr[MAXLINES];
 
-int readlines(char *lineptr[], int nlines);
-void writelines(char *lineptr[], int nlines);
+int readlines(char *lineptr[], int);
+void writelines(char *lineptr[], int, int);
 
-void myqsort(void *lineptr[], int left, int right, int (*comp)(void *, void *));
+void myqsort(void *lineptr[], int, int, int (*comp)(void *, void *));
 int numcmp(char *, char *);
 
 int main(int argc, char *argv[]) {
     int nlines;
     int numeric = 0;
+    int reverse = 0;
+    char *pos;
     
-    if (argc > 1 && strcmp(argv[1], "-n") == 0)
-        numeric = 1;
+    argv++;
+    while (argc-- > 1) {
+        pos = *argv++;
+        while (*pos++) {
+            if (*pos == 'n')
+                numeric = 1;
+            if (*pos == 'r')
+                reverse = 1;
+        }
+    }
+
     if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
         myqsort((void **) lineptr, 0, nlines-1,
                 (int (*)(void *, void *))(numeric ? numcmp :strcmp));
-        writelines(lineptr, nlines);
+        writelines(lineptr, nlines, reverse);
         return 0;
     } else {
         printf("input too big to sort\n");
@@ -83,9 +94,15 @@ int gline(char *line, int lim) {
         return len;
 }
 
-void writelines(char *lineptr[], int nlines) {
-    while (nlines--)
-        printf("%s", *lineptr++);
+void writelines(char *lineptr[], int nlines, int reverse) {
+    if (reverse) {
+        lineptr += nlines;
+        while (nlines--)
+            printf("%s", *--lineptr);
+    }
+    else
+        while (nlines--)
+            printf("%s", *lineptr++);
 }
 
 int numcmp(char *s1, char *s2) {
