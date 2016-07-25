@@ -11,6 +11,8 @@
 
 char *lineptr[MAXLINES];
 int options = 0;
+int pos1 = 0; // field begining at pos1
+int pos2 = 0; // field ending just before pos2
 
 int readlines(char *lineptr[], int);
 void writelines(char *lineptr[], int, int);
@@ -18,34 +20,54 @@ void writelines(char *lineptr[], int, int);
 void myqsort(void *lineptr[], int, int, int (*comp)(void *, void *));
 int numcmp(char *, char *);
 int charcmp(char *s1, char *s2);
+int readargs(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
     int nlines;
-    char *pos;
-    
+    int valid_args;
+
+    valid_args = readargs(argc, argv);
+    if (valid_args) {
+        if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
+            myqsort((void **) lineptr, 0, nlines-1, (options & NUMERIC) ? numcmp : charcmp);
+            writelines(lineptr, nlines, options & REVERSE);
+            return 0;
+        } else {
+            printf("input too big to sort\n");
+            return 1;
+        }
+    }
+}
+
+int readargs(int argc, char *argv[]) {
     argv++;
-    while (argc-- > 1) {
-        pos = *argv++;
-        while (*pos++) {
-            if (*pos == 'n')
-                options |= NUMERIC;
-            if (*pos == 'r')
-                options |= REVERSE;
-            if (*pos == 'f')
-                options |= FOLD;
-            if (*pos == 'd')
-                options |= DIRECTORY;
+    for (; argc > 1; --argc, ++argv) {
+        if (**argv == '-' && isalpha(*(*argv + 1)))
+            for (; **argv; ++*argv) {
+                if (**argv == 'n')
+                    options |= NUMERIC;
+                if (**argv == 'r')
+                    options |= REVERSE;
+                if (**argv == 'f')
+                    options |= FOLD;
+                if (**argv == 'd')
+                    options |= DIRECTORY;
+            }
+        else if (**argv == '-' || **argv == '+') {
+            if (*argv[0]++ == '-') {
+                pos1 = atof(*argv);
+                pos2 += pos1;
+            }
+            else 
+                pos2 += atof(*argv);
+        }
+        else if (**argv != '\0') {
+            printf("ussage ./sort -nrfd -20 +10\n");
+            return 0;
         }
     }
 
-    if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
-        myqsort((void **) lineptr, 0, nlines-1, (options & NUMERIC) ? numcmp : charcmp);
-        writelines(lineptr, nlines, options & REVERSE);
-        return 0;
-    } else {
-        printf("input too big to sort\n");
-        return 1;
-    }
+    return 1;
 }
 
 void myqsort(void *v[], int left, int right, int (*comp)(void *, void *)) {
