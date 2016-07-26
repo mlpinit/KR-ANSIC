@@ -55,7 +55,7 @@ int readargs(int argc, char *argv[]) {
             }
         else if (**argv == '-' || **argv == '+') {
             if (*argv[0]++ == '-') {
-                pos1 = atof(*argv);
+                pos1 = atof(*argv) - 1;
                 pos2 += pos1;
             }
             else 
@@ -149,14 +149,33 @@ int numcmp(char *s1, char *s2) {
         return 0;
 }
 
+
 int charcmp(char *s1, char *s2) {
-    int directory, fold;
+    int directory, fold, lastp1, lastp2, endp;
     char tmp1, tmp2;
 
     fold = options & FOLD;
     directory = options & DIRECTORY;
+    lastp1 = strlen(s1) - 1;
+    lastp2 = strlen(s2) - 1;
 
-    while (*s1 && *s2) {
+    endp = (lastp1 < lastp2) ? lastp1 : lastp2; // default end position
+    if (pos1 && pos2) {
+        if (lastp1 <= pos2 && lastp2 <= pos2) {
+            s1 += pos1;
+            s2 += pos1;
+            endp = pos2; // adjusted end positions if extra characters
+        } else if (lastp1 >= pos1 && lastp2 >= pos1) {
+            s1 += pos1;
+            s2 += pos1;
+            // endp remains unchanged
+        }
+        else
+            // strings are equal if there are no characters to compare
+            return 0;
+    }
+
+    while (*s1 && *s2 && --endp) {
         tmp1 = (islower(*s1) && fold) ? toupper(*s1) : *s1 ;
         tmp2 = (islower(*s2) && fold) ? toupper(*s2) : *s2 ;
 
