@@ -18,6 +18,7 @@ struct key {
     "const", 0,
     "continue", 0,
     "default", 0,
+    "else", 0,
     "exit", 0,
     "for", 0,
     "go", 0,
@@ -64,27 +65,74 @@ int binsearch(char *word, struct key * pairs, int size) {
     return -1;
 }
 
-int getword(char *word, int lim) {
-    int c, getch(void);
-    void ungetch(int);
+void skip_quote(char c);
+void skip_comment(char c);
+void skip_line(void);
 
+int getch(void);
+void ungetch(int);
+
+int getword(char *word, int lim) {
+    int c;
     char *w = word;
 
     while (isspace(c = getch()))
         ;
     if (c != EOF)
         *w++ = c;
+    if (c == '#') {
+        skip_line();
+        return c;
+    }
+    if (c == '"' || c == '\'') {
+        skip_quote(c);
+        return c;
+    }
+    if (c == '/' && ((c = getch()) == '*' || c == '/')) {
+        skip_comment(c);
+        return c;
+    }
+
     if (!isalpha(c)) {
         *w = '\0';
         return c;
     }
     for ( ; --lim > 0; w++)
-        if (!isalnum(*w = getch())) {
+        if (!isalnum(*w = getch()) && *w != '_') {
             ungetch(*w);
             break;
         }
     *w = '\0';
     return word[0];
+}
+
+void skip_quote(char type) {
+    char prev, current;
+
+    prev = type;
+    current = '\0';
+    while ((prev == '\\' || current != type) && prev != current) {
+        prev = current;
+        current = getch();
+    }
+}
+
+void skip_comment(char c) {
+    char prev;
+
+    prev = '\0';
+    if (c == '/')
+        skip_line();
+    else if (c == '*')
+        while (prev != '*' && (c = getch()) != '/')
+            prev = c;
+}
+
+void skip_line(void) {
+    char c;
+
+    while ((c = getch()) != '\n')
+        ;
 }
 
 #define STACKMAX 100
